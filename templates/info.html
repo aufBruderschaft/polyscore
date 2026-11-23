@@ -16,7 +16,7 @@
                     </div>
                  {% endfor %}
             </div>
-            <div class="funnel-note">bars on a log scale · from {{ events }} distinct events</div>
+            <div class="funnel-note">bars to scale · from {{ events }} distinct events</div>
             <div class="article">
                 <nav class="toc">
                     <a href="#ch-data"><span>01</span>data</a>
@@ -30,9 +30,9 @@
                     <section class="chapter" id="ch-data">
                         <div class="chapter-num">01 / data</div>
                         <h2>Where the {{ '{:,}'.format(markets) }} markets come from</h2>
-                        <p>Markets are pulled from the Polymarket <code>gamma-api</code>: closed, tagged crypto, with at least <strong>$100k</strong> in volume. Only markets that stayed open for <strong>30+ days</strong> are kept, so every one of them has a price a month before the end.</p>
-                        <p>For each market the <code>clob</code> price history gives the last YES price at or before <strong>30, 7 and 1 day</strong> before close. That price is read as the crowd's probability. The outcome is simply whether YES won.</p>
-                        <p>Token-launch markets (<strong>TGE</strong>) are picked out by keywords in the question (FDV, airdrop, launch, public sale, TGE) and split into subtypes.</p>
+                        <p>Markets are pulled from <a href="https://docs.polymarket.com/api-reference" target="_blank" rel="noopener"><code>gamma-api.polymarket.com</code></a>: closed, tagged crypto, with at least <strong>$100k</strong> in volume. Only markets that stayed open for <strong>30+ days</strong> are kept, so every one of them has a price a month before the end.</p>
+                        <p>For each market, token prices are pulled from <a href="https://docs.polymarket.com/api-reference" target="_blank" rel="noopener"><code>clob.polymarket.com</code></a>. I saved the last YES price as of <strong>30, 7 and 1 day</strong> before close. That price is the crowd's estimate of how the market will resolve. The outcome is just whether YES won.</p>
+                        <p>Token-launch markets, those around a token generation event (<strong>TGE</strong>), are picked out by keywords in the question (FDV, airdrop, launch, public sale, TGE) and split into subtypes.</p>
                     </section>
                     <section class="chapter" id="ch-brier">
                         <div class="chapter-num">02 / brier score</div>
@@ -55,13 +55,13 @@
                             <div class="fig-axis"><span>0 · perfect</span><span>0.25 · always saying 50%</span></div>
                         </figure>
 
-                        <p>Across all {{ '{:,}'.format(markets) }} markets the crowd scores <strong>{{ '{:.3f}'.format(allcrypto[30]) }}</strong> a month out, <strong>{{ '{:.3f}'.format(allcrypto[7]) }}</strong> a week out and <strong>{{ '{:.3f}'.format(allcrypto[1]) }}</strong> a day out.</p>
+                        <p>Even a month out, the crowd's <strong>{{ '{:.3f}'.format(allcrypto[30]) }}</strong> is about <strong>{{ (0.25 / allcrypto[30]) | round | int }} times lower</strong> than the 0.25 of someone who always says 50%.</p>
                         </section>
                         <section class="chapter" id="ch-calib">
                             <div class="chapter-num">03 / wilson CI</div>
                             <h2>Do 70% markets happen 70% of the time?</h2>
-                            <p>Markets are grouped into ten price buckets: 0–10%, 10–20% and so on. For a well-calibrated crowd, the share of YES outcomes in each bucket matches its average price, and the dots sit on the diagonal.</p>
-                            <p>Each bucket gets a <strong>95% Wilson interval</strong>: the range where the true YES rate probably lies, given how many markets are in it. If the market price falls outside that range, the miss is unlikely to be bad luck.</p>
+                            <p>I grouped markets into ten price buckets: 0–10%, 10–20% and so on. If the prices are well calibrated, the share of YES outcomes in each bucket matches its average price, and the dots sit on the diagonal. But how do we know that a dot off the diagonal is a real miss and not just luck? With only a few markets in a bucket, a big gap can happen randomly.</p>
+                            <p>Each bucket gets a <strong>95% Wilson confidence interval</strong>: the range where the true YES rate probably lies, given how many markets are in it. If that range doesn't reach the diagonal, the miss is unlikely to be luck.</p>
                             <figure class="fig fig-ci">
                                 <div class="fig-head"><span>same 50% yes, different number of markets</span><span>95% wilson ci</span></div>
                                 <div class="fig-row">
@@ -87,19 +87,19 @@
                         <section class="chapter" id="ch-diff">
                             <div class="chapter-num">04 / difficulty</div>
                             <h2>Some groups are simply harder to call</h2>
-                            <p>If YES almost never happens, saying "no" every time already scores well. So each group gets a <strong>difficulty</strong> index: the Brier score of a lazy forecaster who always quotes the group's base rate, scaled to 0–100.</p>
+                            <p>If YES almost never happens, saying "no" every time already scores well. So each group gets a <strong>difficulty</strong> index: the Brier score of someone who always quotes the group's base rate, scaled from 0 to 100.</p>
                             <div class="formula">difficulty = rate × (1 − rate) / 0.25 × 100<small>rate = share of markets in the group that resolved YES</small></div>
-                            <p>All crypto markets score <strong>{{ allcrypto.difficulty }}</strong> out of 100, token launches <strong>{{ tge.difficulty }}</strong>: launch questions are much closer to a coin flip, so a higher Brier score there is less of a failure than it looks.</p>
+                            <p>All crypto markets score <strong>{{ allcrypto.difficulty }}</strong> out of 100, token launches <strong>{{ tge.difficulty }}</strong>: launch questions are much closer to a coin flip, so their higher Brier score partly comes from the higher difficulty, not just from a worse crowd.</p>
 
                         </section>
                         <section class="chapter" id="ch-limits">
                             <div class="chapter-num">05 / limits</div>
                             <h2>What this analysis can't tell you</h2>
                             <ol class="caveats">
-                                <li>Markets are not independent. {{ '{:,}'.format(markets) }} markets come from {{ events }} events, and one event can hold up to {{ biggestm }} near-identical questions. The intervals treat every market as separate, so they are too narrow.</li>
+                                <li>Markets are not independent. {{ '{:,}'.format(markets) }} markets come from {{ events }} events, and one event can hold up to {{ biggestm }} near-identical questions. The Wilson intervals treat every market as separate, so they are too narrow.</li>
                                 <li>Price is the last YES trade before the cut-off, not a full order book. In thin markets it can be stale.</li>
                                 <li>Only liquid markets (over $100k) that lived a month or more are included. The results describe that slice, not all of Polymarket.</li>
-                                <li>TGE markets are found by keywords, not labelled by hand, so a few may be misclassified.</li>
+                                <li>TGE markets are found by keywords, not labelled by hand, so some may be misclassified.</li>
                             </ol>
                         </section>
                 </div>
@@ -108,4 +108,13 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block footer %}
+<div class="foot-logo-wrap">
+        <div class="foot-logo-box">
+            <span class="foot-caption"><span>cs50 final project · data: gamma &amp; clob api</span></span>
+            {% include 'ascii_logo.html' %}
+        </div>
+    </div>
 {% endblock %}

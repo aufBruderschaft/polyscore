@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 import sqlite3
 import pandas as pd
-import math
 import os
 
 app = Flask(__name__)
@@ -46,13 +45,13 @@ def build_dashboard(seg):
         day_word = 'day' if d == 1  else 'days'
 
         if gap > 1:
-            verdict = f'The crowd overpaid for YES by {gap:.1f} pts.'
+            verdict = f'The crowd overpaid for YES by {gap:.1f} points.'
         elif gap < -1:
-            verdict = f'The crowd was too pessimistic, {abs(gap):.1f} pts under.'
+            verdict = f'The crowd was too pessimistic, {abs(gap):.1f} points under.'
         else:
-            verdict = f'Prices were almost exactly right on average.'
+            verdict = f'The crowd was almost exactly right on average.'
         desc = (f"Across {data['n']:,} closed {info['noun']} markets (volume > $100k, open 30+ days), "
-                f"the average YES price {d} {day_word} before close was {p:.1%}, "
+                f"the crowd gave YES a {p:.1%} chance on average {d} {day_word} before close, "
                 f"and {data['yes_rate']:.1%} resolved YES. {verdict}")
         data['horizons'][d] = {
         'p': p,
@@ -103,12 +102,12 @@ def info():
         (meta['valid_dates'], 'with valid open and close dates'),
         (meta['open30d'], 'open for at least 30 days'),
         (stats['markets'], 'with prices at 30, 7 and 1 day and a clean outcome'),
-        (stats['tge'], 'token-launch (TGE) markets: FDV, launch, airdrop, sale'),
+        (stats['tge'], 'token-launch markets around a TGE: FDV, launch, airdrop, sale'),
     ]
-    top = math.log10(steps[0][0])
+    top = steps[0][0]
     funnel = []
     for n, label in steps:
-        funnel.append({'n': int(n), 'label': label, 'width': math.log10(n) / top * 100})
+        funnel.append({'n': int(n), 'label': label, 'width': n / top * 100})
     return render_template('info.html', funnel= funnel, events=int(stats['events']),
                            markets=int(stats['markets']), allcrypto=allcrypto, tge=tge, smallbucket=smallbucket, biggestm=biggestm)
 

@@ -26,7 +26,7 @@
                     <div class="kicker" id="hero-kicker">{{ data.title }} · n = {{ '{:,}'.format(data.n) }} · 30 days before close</div>
                     <p id="hero-desc">{{ h.desc }}</p>
                     <div class="stats">
-                        <span>gap <strong id="st-gap" class="{% if h.gap > 1 or h.gap < -1 %}hot{% endif %}">{{ '{:+.1f}'.format(h.gap) }} pts</strong></span>
+                        <span>gap <strong id="st-gap" class="{% if h.gap > 1 or h.gap < -1 %}hot{% endif %}">{{ '{:+.1f}'.format(h.gap) }} points</strong></span>
                         <span>brier <strong id="st-brier">{{ '{:.3f}'.format(h.brier) }}</strong></span>
                         <span>difficulty <strong id="st-diff">{{ data.difficulty }}/100</strong></span>
                     </div>
@@ -58,7 +58,7 @@
                             </thead>
                             <tbody id="bucket-body"></tbody>
                         </table>
-                        <div class="legend-row"><span class="miss"></span>CI doesn't touch the diagonal: not just noise</div>
+                        <div class="legend-row"><span class="miss"></span>CI doesn't touch the diagonal — not just noise</div>
                         <p class="note" id="bucket-note"></p>
                     </div>
                 </div>

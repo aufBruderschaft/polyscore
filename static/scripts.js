@@ -124,8 +124,8 @@ function render_buckets() {
         note.textContent = '';
         return;
     }
-    const word = worst.gap > 0 ? 'overpriced': 'underpriced';
-    note.textContent = `Biggest miss (n ≥ 10): the ${worst.bucket} bucket was priced at ${percent(worst.mean_price)}, but ${percent(worst.yes_rate)} resolved YES (n = ${worst.n}) - ${word} by ${Math.abs(worst.gap).toFixed(1)} pts.`
+    const word = worst.gap > 0 ? 'overpriced' : 'underpriced';
+    note.textContent = `Biggest miss (n ≥ 10): in the ${worst.bucket} bucket the crowd gave YES a ${percent(worst.mean_price)} chance, but ${percent(worst.yes_rate)} resolved YES (n = ${worst.n}) — ${word} by ${Math.abs(worst.gap).toFixed(1)} points.`
 };
 
 function render_hero() {
@@ -139,7 +139,7 @@ function render_hero() {
     document.getElementById('hero-desc').textContent = h.desc;
 
     const gapEl = document.getElementById('st-gap');
-    gapEl.textContent = `${sign}${h.gap.toFixed(1)} pts`;
+    gapEl.textContent = `${sign}${h.gap.toFixed(1)} points`;
     gapEl.classList.toggle('hot', Math.abs(h.gap) > 1);
 
     document.getElementById('st-brier').textContent = h.brier.toFixed(3)
