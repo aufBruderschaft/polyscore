@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+{% block controls %}
+    <div class="horizon">
+        <span class="label">horizon</span>
+        <button class="tab active" data-days="30">30d</button>
+        <button class="tab" data-days="7">7d</button>
+        <button class="tab" data-days="1">1d</button>
+    </div>
+{% endblock %}
+
+{% block main %}
+    {% set h = data.horizons[30] %}
+
+    <section class="hero">
+        <pre class="hero-bg" id="hero-bg" aria-hidden="true"></pre>
+        <div class="container hero-inner">
+            <h1 class="headline">
+                <span class="line">Polymarket said <span id="hero-p">{{ '{:.1%}'.format(h.p) }}</span>.</span>
+                <span class="line">Reality was <span id="hero-r" class="accent">{{ '{:.1%}'.format(data.yes_rate) }}</span>.</span>
+            </h1>
+
+            <div class="hero-bottom">
+                <a href="#sheet" class="scroll-hint"><span class="arrow">↓</span> scroll for calibration</a>
+
+                <div class="hero-meta">
+                    <div class="kicker" id="hero-kicker">{{ data.title }} · n = {{ '{:,}'.format(data.n) }} · 30 days before close</div>
+                    <p id="hero-desc">{{ h.desc }}</p>
+                    <div class="stats">
+                        <span>gap <strong id="st-gap" class="{% if h.gap > 1 or h.gap < -1 %}hot{% endif %}">{{ '{:+.1f}'.format(h.gap) }} pts</strong></span>
+                        <span>brier <strong id="st-brier">{{ '{:.3f}'.format(h.brier) }}</strong></span>
+                        <span>difficulty <strong id="st-diff">{{ data.difficulty }}/100</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="sheet" id="sheet">
+        <div class="grabber"></div>
+        <div class="container">
+
+            <section class="section">
+                <div class="section-head">
+                    <div class="kicker red">empirical calibration</div>
+                    <h2>Calibration curve: {{ data.title }}</h2>
+                    <div class="sub">10 buckets · 95% Wilson CI · dot size = √n + 8px</div>
+                </div>
+
+                <div class="calib-grid">
+                    <div id="chart"></div>
+                        <div id="bucket-panel">
+                        <div class="table-head">
+                            <span>bucket breakdown</span>
+                            <span id="ci-count"></span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr><th>range</th><th>n</th><th>said</th><th>actual</th><th>gap</th></tr>
+                            </thead>
+                            <tbody id="bucket-body"></tbody>
+                        </table>
+                        <div class="legend-row"><span class="miss"></span>CI doesn't touch the diagonal: not just noise</div>
+                        <p class="note" id="bucket-note"></p>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="section-head">
+                    <div class="kicker red">segments</div>
+                    <h2>Brier &amp; difficulty by group</h2>
+                    <div class="sub">lower brier = better · difficulty: 0 = obvious, 100 = coin flip</div>
+                </div>
+
+                <div class="scroll-x">
+                    <table class="groups">
+                        <thead>
+                            <tr>
+                                <th>group</th><th>markets</th><th>events</th><th>yes rate</th>
+                                <th data-col="30">brier 30d</th><th data-col="7">brier 7d</th><th data-col="1">brier 1d</th>
+                                <th>difficulty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for g in data.groups %}
+                                {% set sub = g.group not in ['all crypto', 'TGE'] %}
+                                <tr class="{% if g.group == data.title %}current{% endif %}">
+                                    <td class="{% if sub %}indent{% endif %}">{% if sub%}↳ {% endif %}{{ g.group }}</td>
+                                    <td>{{ '{:,}'.format(g.n) }}</td>
+                                    <td>{{ g.events }}</td>
+                                    <td>{{ '{:.1%}'.format(g.yes_rate) }}</td>
+                                    <td data-col="30">{{ '{:.3f}'.format(g.brier30) }}</td>
+                                    <td data-col="7">{{ '{:.3f}'.format(g.brier7) }}</td>
+                                    <td data-col="1">{{ '{:.3f}'.format(g.brier1) }}</td>
+                                    <td>
+                                        <span class="diff">
+                                            {{ g.difficulty | int }}
+                                            <span class="bar"><span style="width: {{ g.difficulty | int }}%"></span></span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="section">
+                <div class="section-head">
+                    <div class="kicker red">largest markets</div>
+                    <h2>Top 5 {{ data.noun }} markets by volume</h2>
+                    <div class="sub">YES price 30, 7 and 1 day before close</div>
+                </div>
+
+                <div class="scroll-x">
+                    <table class="markets">
+                        <thead>
+                            <tr><th>question</th><th>volume</th><th>30d</th><th>7d</th><th>1d</th><th>outcome</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for m in data.top %}
+                                <tr>
+                                    <td>{{ m.question }}</td>
+                                    <td>{{ '${:.1f}M'.format(m.volumeNum / 1000000) }}</td>
+                                    <td>{{ '{:.1%}'.format(m.p30) }}</td>
+                                    <td>{{ '{:.1%}'.format(m.p7) }}</td>
+                                    <td>{{ '{:.1%}'.format(m.p1) }}</td>
+                                    <td><span class="outcome {% if m.yes_won%}yes{% endif %}">{% if m.yes_won%}YES{% else %}NO{% endif %}</span></td>
+                                </tr>
+                            {% endfor %}    
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.plot.ly/plotly-basic-2.32.0.min.js"></script>
+    <script>
+        const DATA = {{ data | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+{% endblock %}
+
+{% block footer %}
+    <div class="foot-logo-wrap">
+        <div class="foot-logo-box">
+            <span class="foot-caption"><span>cs50 final project · data: gamma &amp; clob api</span></span>
+            {% include 'ascii_logo.html' %}
+        </div>
+    </div>
+{% endblock %}

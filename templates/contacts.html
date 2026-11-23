@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+    <div class="page">
+        <div class="container">
+            <div class="kicker red">contact</div>
+            <h1 class="contact-title">Prove my<br>numbers <span class="accent">wrong</span>.</h1>
+            <p class="page-lead">If you can. Or just say hi: prediction markets, crypto or how your day's been.</p>
+            <div class="status"><span class="pulse"></span>open to feedback and collaboration</div>
+
+            <div class="links">
+                <a class="link-row" href="https://github.com/aufBruderschaft" target="_blank" rel="noopener">
+                    <span class="lr-label">github</span>
+                    <span class="lr-value">github.com/aufBruderschaft</span>
+                    <span class="lr-arrow">↗</span>
+                </a>
+                <a class="link-row" href="https://t.me/aufBruderschaft" target="_blank" rel="noopener">
+                    <span class="lr-label">telegram</span>
+                    <span class="lr-value">@aufBruderschaft</span>
+                    <span class="lr-arrow">↗</span>
+                </a>
+                <a class="link-row" href="mailto:bruderschaft26@gmail.com">
+                    <span class="lr-label">email</span>
+                    <span class="lr-value">bruderschaft26@gmail.com</span>
+                    <span class="lr-arrow">↗</span>
+                </a>
+            </div>
+            <div class="colophon">
+                <div>
+                    <div class="kicker red">colophon</div>
+                    <h3>Why and How I made polyscore</h3>
+                    <p>Made as my CS50 final project. The analytics lives in a Jupyter notebook, the results in SQLite, the site is based on Flask with custom CSS and JavaScript.</p>
+                </div>
+                <div class="json-card">
+                    <div class="json-card-head"><i></i><i></i><i></i><span>project.json</span></div>
+<pre>{
+  <span class="j-key">"project"</span>: <span class="j-str">"polyscore"</span>,
+  <span class="j-key">"course"</span>: <span class="j-str">"CS50x final project"</span>,
+  <span class="j-key">"question"</span>: <span class="j-str">"Are Polymarket crypto prices calibrated?"</span>,
+  <span class="j-key">"data"</span>: {
+    <span class="j-key">"source"</span>: <span class="j-str">"Polymarket gamma &amp; clob API"</span>,
+    <span class="j-key">"markets"</span>: <span class="j-num">{{ markets }}</span>,
+    <span class="j-key">"events"</span>: <span class="j-num">{{ events }}</span>,
+    <span class="j-key">"tge_markets"</span>: <span class="j-num">{{ tge }}</span>
+  },
+  <span class="j-key">"metrics"</span>: [
+    <span class="j-str">"Brier score"</span>,
+    <span class="j-str">"Wilson 95% CI"</span>,
+    <span class="j-str">"difficulty index"</span>
+  ],
+  <span class="j-key">"stack"</span>: [
+    <span class="j-str">"Python"</span>,
+    <span class="j-str">"pandas"</span>,
+    <span class="j-str">"SQLite"</span>,
+    <span class="j-str">"Flask"</span>,
+    <span class="j-str">"Jinja"</span>,
+    <span class="j-str">"Plotly"</span>,
+    <span class="j-str">"JavaScript"</span>
+  ],
+  <span class="j-key">"author"</span>: <span class="j-str">"bruderschaft"</span>,
+  <span class="easter" title="yes, yes, shame on me"><span class="j-key">"pair_programmer"</span>: <span class="j-str">"claude"</span></span>
+}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

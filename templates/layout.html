@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>polyscore</title>
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon-180.png') }}">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+        <script>
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+        </script>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+        <body class="{% block body_class %}{% endblock %}">
+            <header class="header" id="header">
+                <div class="container header-row">
+                    <div class="header-left">
+                        <a href="/" class="logo"><span class="lb">{</span>poly<span class="lb">}</span>score</a>
+                        <nav class="nav">
+                            <a href="/" class="tab {% if request.path == '/' %}active{% endif %}">Crypto</a>
+                            <a href="/tge" class="tab {% if request.path == '/tge' %}active{% endif %}">Token launches</a>
+                            <a href="/info" class="tab {% if request.path == '/info' %}active{% endif %}">Methodology</a>
+                            <a href="/contacts" class="tab {% if request.path == '/contacts' %}active{% endif %}">Contact</a>
+                        </nav>
+                    </div>
+                    <div class="header-right">
+                        {% block controls %}{% endblock %}
+                        <button class="theme-btn" id="theme-btn"><span class="dot"></span><span id="theme-label">light</span></button>
+                    </div>
+                </div>
+            </header>
+        <main>
+            {% block main %}{% endblock %}
+        </main>
+        <script src="{{ url_for('static', filename='theme.js') }}"></script>
+        <footer class="footer">
+            {% block footer %}
+            <div class="container">
+                <span class="logo"><span class="lb">{</span>poly<span class="lb">}</span>score</span>
+                <span>cs50 final project · data: gamma &amp; clob api</span>
+            </div>
+            {% endblock %}
+        </footer>
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+
+{% block body_class %}bare{% endblock %}
+
+{% block main %}
+    <div class="error-page">
+        <div class="container">
+            <h1 class="error-code"><span class="lb">{</span>{{ code }}<span class="lb">}</span></h1>
+            <p class="error-text">{{ text }}</p>
+            <p class="error-market">market: "{{ market }}" · resolved <b>NO</b></p>
+            <a href="/" class="back-link">← back to the dashboard</a>
+        </div>
+    </div>
+{% endblock %}
