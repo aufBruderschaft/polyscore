@@ -92,7 +92,7 @@ function render_chart() {
         },
     ]
     };
-    Plotly.react('chart', [zone, diagonal, points], layout, {displayModeBar: false, responsive: true });
+    Plotly.react('chart', [zone, diagonal, points], layout, {displayModeBar: false, responsive: true, staticPlot: matchMedia('(pointer: coarse)').matches });
 };
 
 function render_buckets() {
